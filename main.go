@@ -10,9 +10,9 @@ import (
 func main() {
 	if len(os.Args) == 1 || (len(os.Args) > 1 && os.Args[1] == "client") {
 		app.RunClient()
-	} else if len(os.Args) > 1 && os.Args[1] == "server" {
-		app.RunServer()
+	} else if len(os.Args) > 2 && os.Args[1] == "server" {
+		app.RunServer(os.Args[2])
 	} else {
-		fmt.Println("Usage: gochat [client|server]")
+		fmt.Println("Usage: gochat [client|server ip]")
 	}
 }

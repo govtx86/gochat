@@ -15,8 +15,8 @@ type User struct {
 
 var Users = make(map[string]User)
 
-func runListener(port int) {
-	listener, err := net.Listen("tcp", fmt.Sprintf("localhost:%d", port))
+func runListener(address string, port int) {
+	listener, err := net.Listen("tcp", fmt.Sprintf("%s:%d", address, port))
 	if err != nil {
 		fmt.Println("err:", err)
 	}
@@ -91,7 +91,7 @@ func broadcastUserList() {
 	}
 }
 
-func RunServer() {
+func RunServer(address string) {
 	port := 8080
-	runListener(port)
+	runListener(address, port)
 }
