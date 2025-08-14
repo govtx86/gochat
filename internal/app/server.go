@@ -46,20 +46,20 @@ func runListener(address string, port int) {
 			username: username,
 		}
 		conn.Write([]byte("200\n"))
+		broadcastUserList()
 		go handleClient(Users[username])
 	}
 }
 
 func handleClient(user User) {
 	defer func() {
+		delete(Users, user.username)
+		broadcastUserList()
 		user.conn.Close()
 		for _, u := range Users {
 			u.conn.Write([]byte(user.username + " left!\n"))
 		}
-		delete(Users, user.username)
-		broadcastUserList()
 	}()
-	broadcastUserList()
 	for {
 		msg, err := bufio.NewReader(user.conn).ReadString('\n')
 		if err != nil {
@@ -82,11 +82,15 @@ func broadcast(msg string, username string) {
 }
 
 func broadcastUserList() {
-	var users string
 	for _, u := range Users {
-		users = users + u.username + "#$"
-	}
-	for _, u := range Users {
+		var users string
+		for _, user := range Users {
+			if u.username == user.username {
+				users += user.username + " (You) #$"
+				continue
+			}
+			users += user.username + "#$"
+		}
 		u.conn.Write([]byte("#srvc:" + users + "\n"))
 	}
 }

@@ -68,7 +68,7 @@ func RunClient() {
 			username := connection.GetFormItemByLabel("Username").(*tview.InputField).GetText()
 			address := connection.GetFormItemByLabel("Address").(*tview.InputField).GetText()
 			port := connection.GetFormItemByLabel("Port").(*tview.InputField).GetText()
-			conn, err = net.Dial("tcp", fmt.Sprintf("%s:%s", address, port))
+			conn, err = net.Dial("tcp", net.JoinHostPort(address, port))
 			if err != nil {
 				connection.GetFormItemByLabel("Status").(*tview.TextView).SetText("Error Connecting")
 				return
@@ -90,7 +90,11 @@ func RunClient() {
 							return
 						}
 						if strings.Contains(msgResp, "#srvc:") {
-							users.SetText(strings.ReplaceAll(strings.Trim(msgResp, "#srvc:"), "#$", "\n"))
+							go func() {
+								app.QueueUpdateDraw(func() {
+									users.SetText(strings.ReplaceAll(strings.Trim(msgResp, "#srvc:"), "#$", "\n"))
+								})
+							}()
 						} else {
 							msg := strings.Trim(msgResp, "\r\n")
 							chat.SetText(chat.GetText(true) + msg + "\n")
